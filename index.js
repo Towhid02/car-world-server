@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,17 +31,64 @@ async function run() {
 
     const carsCollection = client.db('carsDB').collection('cars');
         // const userCollection = client.db('coffeeDB').collection('user');
-        app.post('/user', async (req, res) => {
-          const user = req.body;
-          console.log(user);
-          const result = await carsCollection.insertOne(user);
-          res.send(result);
+    app.post('/user', async (req, res) => {
+        const user = req.body;
+        console.log(user);
+        const result = await carsCollection.insertOne(user);
+        res.send(result);
       })
-      app.get('/user', async (req, res) => {
+
+    app.get('/cars', async (req, res) => {
         const cursor = carsCollection.find();
-        const users = await cursor.toArray();
-        res.send(users);
+        const result = await cursor.toArray();
+        res.send(result);
+        })
+
+    app.get('/cars/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)}
+        const result = await carsCollection.findOne(query);
+        res.send(result);
+        })
+        
+    app.post('/cars', async (req, res) => {
+        const newCar = req.body;
+        console.log(newCar);
+        const result = await carsCollection.insertOne(newCar);
+        res.send(result);
+      })
+    
+      app.put('/cars/:id', async(req, res)=>{
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id)};
+        const options = {upsert: true};
+        const updatedCar = {
+          $set: {
+            name: updatedCar.name, 
+            brand: updatedCar.brand, 
+            model: updatedCar.model, 
+            type: updatedCar.type, 
+            rating: updatedCar.rating, 
+            price:updatedCar.price, 
+            image: updatedCar.image,
+          }
+        }
+      })
+
+    app.delete('/cars/:id', async(req, res)=> {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id)}
+      const result= await carsCollection.deleteOne(query);
+      res.send(result)
     })
+
+    app.get('/cars', async (req, res) => {
+        const cursor = carsCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+})
+
+    
         
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
