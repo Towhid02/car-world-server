@@ -62,7 +62,8 @@ async function run() {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id)};
         const options = {upsert: true};
-        const updatedCar = {
+        const updatedCar = req.body
+        const updated = {
           $set: {
             name: updatedCar.name, 
             brand: updatedCar.brand, 
@@ -73,6 +74,8 @@ async function run() {
             image: updatedCar.image,
           }
         }
+        const result = await carsCollection.updateOne(filter, updated, options);
+        res.send(result);
       })
 
     app.delete('/cars/:id', async(req, res)=> {
