@@ -28,7 +28,8 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
+    
+    const brandsCollection = client.db('carsDB').collection('brands');
     const carsCollection = client.db('carsDB').collection('cars');
         // const userCollection = client.db('coffeeDB').collection('user');
     app.post('/user', async (req, res) => {
@@ -43,11 +44,24 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
         })
+    app.get('/brands', async (req, res) => {
+        const cursor = brandsCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+        })
 
     app.get('/cars/:id', async (req, res) => {
         const id = req.params.id;
         const query = {_id: new ObjectId(id)}
         const result = await carsCollection.findOne(query);
+        res.send(result);
+        })
+
+    app.get('/brand/:brand', async (req, res) => {
+        const brand = req.params.brand;
+        const query = {brand:brand}
+        const cursor = carsCollection.find(query)
+        const result = await cursor.toArray(query);
         res.send(result);
         })
         
