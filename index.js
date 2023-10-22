@@ -31,6 +31,8 @@ async function run() {
     
     const brandsCollection = client.db('carsDB').collection('brands');
     const carsCollection = client.db('carsDB').collection('cars');
+    const cartDb = client.db('cartDB')
+    
         // const userCollection = client.db('coffeeDB').collection('user');
     app.post('/user', async (req, res) => {
         const user = req.body;
@@ -92,10 +94,10 @@ async function run() {
         res.send(result);
       })
 
-    app.delete('/cars/:id', async(req, res)=> {
+    app.delete('/carts/:id', async(req, res)=> {
       const id = req.params.id;
       const query = { _id: new ObjectId(id)}
-      const result= await carsCollection.deleteOne(query);
+      const result= await cartCollection.deleteOne(query);
       res.send(result)
     })
 
@@ -104,6 +106,24 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
 })
+
+  app.post('/carts', async (req, res) => {
+    const {email, products} = req.body;
+   console.log(email, products);
+   const{_id, ...data} = products
+   const cartCollection = cartDb.collection(email)
+    const result = await cartCollection.insertOne(data);
+    res.send(result);
+})
+
+  app.get('/carts/:email', async (req, res) => {
+   const email = req.params.email;
+   const query = {email: email}
+   const cartCollection = cartDb.collection(email)
+   const cursor = cartCollection.find()
+   const result = await cursor.toArray(query);
+   res.send(result);
+  })
 
     
         
